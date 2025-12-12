@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>I-15 Traffic Simulator</title>
+        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+        <!-- Font Awesome icons (free version)-->
+        <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+        <!-- Google fonts-->
+        <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="css/styles.css" rel="stylesheet" />
+        <link href="css/customstyles.css" rel="stylesheet" />
+    </head>
+    <body>
+        <!-- Navigation-->
+        <nav class="navbar navbar-expand-lg navbar-light" id="mainNav">
+            <div class="container px-4 px-lg-5">
+                <a class="navbar-brand" href="index.html">Guppy.com</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                    Menu
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <ul class="navbar-nav ms-auto py-4 py-lg-0">
+                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="index.html">Home</a></li>
+                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="resume.html">Resume</a></li>
+                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="webapp.html">Web App</a></li>
+                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="scratch.html">Scratch</a></li>                        <!-- <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="contact.html">Contact</a></li> -->
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <!-- Page Header
+        <header class="masthead" style="background-image: url('assets/img/post-bg.jpg')">
+            <div class="container position-relative px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <div class="post-heading">
+                            <h1>Here is my super sick AI WebApp</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>      
+     Bootstrap core JS-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Core theme JS-->
+        <script src="js/scripts.js"></script>
+    </body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>I-15 Traffic Simulator</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #2c3e50;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #game-container {
+            position: absolute;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        canvas {
+            background-color: #4CAF50; /* Grass color */
+            display: block;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .hud {
+            padding: 10px;
+            text-shadow: 2px 2px 0 #000;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+        }
+
+        .hud-left { display: flex; flex-direction: column; gap: 5px; }
+        .hud-right { text-align: right; display: flex; flex-direction: column; gap: 5px;}
+
+        #message-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            border: 4px solid white;
+            padding: 20px;
+            text-align: center;
+            pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            min-width: 300px;
+            z-index: 10;
+        }
+
+        button {
+            border: 2px solid white;
+            color: white;
+            font-family: 'Press Start 2P', cursive;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 10px;
+            margin: 5px 0;
+            width: 100%;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        .car-select-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Mobile Controls */
+        #mobile-controls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            height: 150px;
+            pointer-events: auto;
+            display: none; /* Shown via JS if touch detected */
+        }
+        
+        .d-pad {
+            display: grid;
+            grid-template-columns: 60px 60px 60px;
+            grid-template-rows: 60px 60px;
+            gap: 5px;
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 5px;
+        }
+        .btn:active { background: rgba(255, 255, 255, 0.5); }
+        .btn-up { grid-column: 2; grid-row: 1; }
+        .btn-down { grid-column: 2; grid-row: 2; }
+        .btn-left { grid-column: 1; grid-row: 2; }
+        .btn-right { grid-column: 3; grid-row: 2; }
+
+        @media (max-width: 600px) {
+            #mobile-controls { display: block; }
+            .hud { font-size: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <canvas id="gameCanvas" width="500" height="700"></canvas>
+    
+    <div id="ui-layer">
+        <div class="hud">
+            <div class="hud-left">
+                <div id="timer-display" style="color: #f1c40f;">TIME: 1:00</div>
+                <div id="speed-display">SPEED: 0 MPH</div>
+            </div>
+            <div class="hud-right">
+                <div id="exit-display">NEXT: Provo Center St</div>
+            </div>
+        </div>
+        
+        <div id="message-box">
+            <h2 id="title-text" style="color:#f1c40f">I-15 SIMULATOR</h2>
+            <div id="start-content">
+                <p id="desc-text" style="font-size: 10px; line-height: 1.5; margin-bottom: 15px;">
+                    <span style="color:#e74c3c; font-weight:bold;">YOU ARE LATE FOR WORK!</span><br><br>
+                    GET TO SLC IN 60 SECONDS.<br>
+                    HOV LANE IS FASTER.<br>
+                    DON'T SPEED PAST COPS. <br>
+                    DON'T PASS COPS ON RIGHT.<br>
+                </p>
+                <div style="text-align: left; margin-bottom: 5px; font-size: 10px; color: #aaa;">SELECT VEHICLE:</div>
+                <button class="car-select-btn" onclick="startGame('accord')" style="background: #c0392b;">
+                    <span>2023 Honda Accord</span>
+                </button>
+                <button class="car-select-btn" onclick="startGame('tacoma')" style="background: #7f8c8d;">
+                    <span>2010 Toyota Tacoma</span>
+                </button>
+                <button class="car-select-btn" onclick="startGame('f150')" style="background: #2980b9;">
+                    <span>2004 Ford F-150</span>
+                </button>
+            </div>
+            <div id="game-over-content" class="hidden">
+                <p id="game-over-text" style="font-size: 10px; line-height: 1.5; margin-bottom: 15px;"></p>
+                <button onclick="resetToMenu()" style="background: #27ae60;">MAIN MENU</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Overlay Controls -->
+    <div id="mobile-controls">
+        <div class="d-pad">
+            <div class="btn btn-up" id="btn-up"></div>
+            <div class="btn btn-left" id="btn-left"></div>
+            <div class="btn btn-down" id="btn-down"></div>
+            <div class="btn btn-right" id="btn-right"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+/** * I-15 TRAFFIC SIMULATOR
+ * A single-file HTML5 Canvas game.
+ */
+
+// --- CONFIGURATION ---
+const CANVAS_WIDTH = 500;
+const CANVAS_HEIGHT = 700;
+const LANE_COUNT = 5;
+const LANE_WIDTH = 70; // Road width = 350
+const ROAD_X = (CANVAS_WIDTH - (LANE_COUNT * LANE_WIDTH)) / 2; // Center road
+const FPS = 60;
+
+const COLORS = {
+    grass: '#4CAF50',
+    road: '#555555',
+    line: '#FFFFFF',
+    hovLine: '#FFEB3B', // Double yellow/white
+    playerRed: '#e74c3c',
+    playerGrey: '#7f8c8d',
+    playerBlue: '#2980b9',
+    traffic: ['#3498db', '#9b59b6', '#f1c40f', '#e67e22', '#1abc9c'], // Random car colors
+    truck: '#95a5a6', // Gray for trucks
+    truckCab: '#7f8c8d',
+    police: '#000000',
+    policeLightRed: '#ff0000',
+    policeLightBlue: '#0000ff'
+};
+
+const EXITS = [
+    "Provo Center St",
+    "University Pkwy",
+    "1600 North",
+    "Lehi Main St.",
+    "Bangerter Hwy",
+    "10300 S",
+    "9000 S",
+    "5300 S",
+    "600 S",
+    "Salt Lake City"
+];
+
+const EXIT_INTERVAL = 3000; // Distance units between exits
+const MPH_SCALE = 6; // Multiplier to convert game speed units to MPH
+const AVG_TRAFFIC_SPEED = 10; // 10 units * 6 = 60 MPH
+const TIME_LIMIT = 60; // Seconds
+
+// --- GAME STATE ---
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+let gameState = 'START'; 
+let score = 0; 
+let distance = 0;
+let speed = 0; // Game units
+let mph = 0; // Display units
+let baseSpeed = 0;
+let currentExitIndex = 0;
+let lastExitSpawnDistance = 0;
+let lastSpeedLimitSpawnDistance = 0;
+let frameCount = 0;
+let startTime = 0;
+let timeRemaining = TIME_LIMIT;
+let selectedCarModel = 'accord'; // 'accord', 'tacoma', 'f150'
+
+// Inputs
+const keys = {
+    ArrowUp: false,
+    ArrowDown: false,
+    ArrowLeft: false,
+    ArrowRight: false
+};
+
+// --- OBJECTS ---
+
+class Car {
+    constructor(lane, y, type) {
+        this.type = type; // 'player', 'traffic', 'police', 'truck'
+        this.width = 40;
+        this.lane = lane; // 0-4
+        this.model = null; // Only for player
+
+        if (type === 'truck') {
+            this.height = 210;
+        } else if (type === 'player') {
+             // Size depends on selected model
+             if (selectedCarModel === 'f150') {
+                 this.height = 85; 
+                 this.width = 44;
+             } else if (selectedCarModel === 'tacoma') {
+                 this.height = 80;
+                 this.width = 42;
+             } else {
+                 this.height = 70; // Accord
+             }
+        } else {
+            this.height = 70;
+        }
+
+        // Calculate X based on lane
+        this.x = ROAD_X + (lane * LANE_WIDTH) + (LANE_WIDTH - this.width) / 2;
+        this.y = y;
+        
+        // Colors
+        if (type === 'traffic') this.color = COLORS.traffic[Math.floor(Math.random() * COLORS.traffic.length)];
+        else if (type === 'truck') this.color = COLORS.truck;
+        else if (type === 'police') this.color = COLORS.police;
+        else if (type === 'player') {
+            if (selectedCarModel === 'f150') this.color = COLORS.playerBlue;
+            else if (selectedCarModel === 'tacoma') this.color = COLORS.playerGrey;
+            else this.color = COLORS.playerRed;
+        }
+        
+        // Speed
+        if (type === 'player') {
+            this.speed = 0;
+            this.maxSpeed = 0;
+        } else {
+            // Traffic
+            let laneSpeedFactor = (2 - lane) * 0.5; 
+            let base = AVG_TRAFFIC_SPEED + laneSpeedFactor;
+
+            if (type === 'truck') base = 8;
+            else if (type === 'police') base = 8.33; // 50 MPH
+            else base += (Math.random() * 2 - 1); 
+
+            this.speed = base;
+            if (this.speed < 5) this.speed = 5;
+            this.maxSpeed = this.speed;
+        }
+    }
+
+    draw() {
+        // Draw Shadow
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.fillRect(this.x + 5, this.y + 5, this.width, this.height);
+
+        if (this.type === 'truck') {
+            // -- SEMI TRUCK (Revised: Front is Top) --
+            
+            // Cab (Front/Top)
+            ctx.fillStyle = COLORS.truckCab;
+            ctx.fillRect(this.x, this.y, this.width, 40);
+            
+            // Windshield
+            ctx.fillStyle = '#222';
+            ctx.fillRect(this.x + 2, this.y + 5, this.width - 4, 10);
+            
+            // Link
+            ctx.fillStyle = '#333';
+            ctx.fillRect(this.x + 15, this.y + 40, 10, 10);
+            
+            // Trailer (Back/Bottom)
+            ctx.fillStyle = this.color;
+            ctx.fillRect(this.x, this.y + 50, this.width, this.height - 50);
+            
+            // Trailer Detailing
+            ctx.fillStyle = '#7f8c8d';
+            ctx.fillRect(this.x + 2, this.y + 52, this.width - 4, this.height - 54);
+
+        } else if (this.type === 'police') {
+            // -- POLICE --
+            ctx.fillStyle = '#000';
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+            ctx.fillStyle = '#FFF';
+            ctx.fillRect(this.x, this.y + 15, this.width, this.height - 30); 
+            if (Math.floor(Date.now() / 150) % 2 === 0) {
+                ctx.fillStyle = COLORS.policeLightRed;
+                ctx.fillRect(this.x + 2, this.y + 10, 10, 5);
+                ctx.fillStyle = '#333';
+                ctx.fillRect(this.x + this.width - 12, this.y + 10, 10, 5);
+            } else {
+                ctx.fillStyle = '#333';
+                ctx.fillRect(this.x + 2, this.y + 10, 10, 5);
+                ctx.fillStyle = COLORS.policeLightBlue;
+                ctx.fillRect(this.x + this.width - 12, this.y + 10, 10, 5);
+            }
+        } else if (this.type === 'player' && (selectedCarModel === 'f150' || selectedCarModel === 'tacoma')) {
+            // -- PICKUP TRUCK (PLAYER) --
+            // Top is Front, Bottom is Back
+            
+            // Main Body Color
+            ctx.fillStyle = this.color;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+            
+            // Windshield (Near Top)
+            ctx.fillStyle = '#222';
+            ctx.fillRect(this.x + 2, this.y + (this.height * 0.2), this.width - 4, 10);
+            
+            // Cab Roof (Middle-Top)
+            ctx.fillStyle = this.color; // Roof
+            ctx.fillRect(this.x + 2, this.y + (this.height * 0.25), this.width - 4, this.height * 0.3);
+            
+            // Truck Bed Liner (Black, near Bottom/Back)
+            ctx.fillStyle = '#111';
+            ctx.fillRect(this.x + 4, this.y + (this.height * 0.6), this.width - 8, this.height * 0.35);
+
+            // Tailgate (Very Bottom)
+            ctx.fillStyle = this.color;
+            ctx.fillRect(this.x, this.y + (this.height * 0.95), this.width, this.height * 0.05);
+            
+        } else {
+            // -- SEDAN (PLAYER OR TRAFFIC) --
+            ctx.fillStyle = this.color;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+            ctx.fillStyle = '#222';
+            ctx.fillRect(this.x + 4, this.y + 10, this.width - 8, 15);
+            ctx.fillStyle = this.color; 
+            ctx.fillRect(this.x + 4, this.y + 25, this.width - 8, 20);
+            ctx.fillStyle = '#222'; 
+            ctx.fillRect(this.x + 4, this.y + 45, this.width - 8, 10);
+        }
+
+        // Headlights (Top) / Taillights (Bottom) for all except Semi (handled above)
+        if (this.type !== 'truck') {
+            ctx.fillStyle = '#FFF'; 
+            ctx.fillRect(this.x + 2, this.y, 6, 4);
+            ctx.fillRect(this.x + this.width - 8, this.y, 6, 4);
+            
+            ctx.fillStyle = '#c0392b'; 
+            ctx.fillRect(this.x + 2, this.y + this.height - 4, 6, 4);
+            ctx.fillRect(this.x + this.width - 8, this.y + this.height - 4, 6, 4);
+        }
+    }
+}
+
+class SceneryObject {
+    constructor(y, type, text = "") {
+        this.y = y;
+        this.type = type; // 'exit', 'ramp', 'speedlimit'
+        this.text = text;
+        this.scored = false;
+        
+        this.roadRightEdge = ROAD_X + (LANE_COUNT * LANE_WIDTH);
+    }
+
+    draw() {
+        if (this.type === 'exit') {
+            this.drawExitSign();
+        } else if (this.type === 'ramp') {
+            this.drawRamp();
+        } else if (this.type === 'speedlimit') {
+            this.drawSpeedLimit();
+        }
+    }
+
+    drawRamp() {
+        ctx.fillStyle = COLORS.road;
+        ctx.beginPath();
+        ctx.moveTo(this.roadRightEdge, this.y);
+        ctx.bezierCurveTo(
+            this.roadRightEdge + 50, this.y + 50, 
+            this.roadRightEdge + 100, this.y + 150, 
+            this.roadRightEdge + 150, this.y + 300
+        );
+        ctx.lineTo(this.roadRightEdge + 220, this.y + 300);
+        ctx.bezierCurveTo(
+            this.roadRightEdge + 170, this.y + 150, 
+            this.roadRightEdge + 120, this.y + 50, 
+            this.roadRightEdge, this.y + 300 
+        );
+        ctx.fill();
+
+        ctx.strokeStyle = '#FFF';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(this.roadRightEdge, this.y);
+        ctx.bezierCurveTo(
+            this.roadRightEdge + 50, this.y + 50, 
+            this.roadRightEdge + 100, this.y + 150, 
+            this.roadRightEdge + 150, this.y + 300
+        );
+        ctx.stroke();
+    }
+
+    drawSpeedLimit() {
+        const x = this.roadRightEdge + 5;
+        ctx.fillStyle = '#7f8c8d';
+        ctx.fillRect(x + 20, this.y, 5, 50);
+        ctx.fillStyle = '#FFF';
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        ctx.fillRect(x, this.y - 60, 45, 60);
+        ctx.strokeRect(x, this.y - 60, 45, 60);
+        ctx.fillStyle = '#000';
+        ctx.textAlign = 'center';
+        ctx.font = '8px "Press Start 2P"';
+        ctx.fillText("SPEED", x + 22.5, this.y - 45);
+        ctx.fillText("LIMIT", x + 22.5, this.y - 35);
+        ctx.font = '14px "Press Start 2P"';
+        ctx.fillText("70", x + 22.5, this.y - 15);
+    }
+
+    drawExitSign() {
+        const x = this.roadRightEdge + 5;
+        const width = 120;
+        const height = 60;
+        
+        // Post
+        ctx.fillStyle = '#7f8c8d';
+        ctx.fillRect(x, this.y, 10, 60);
+
+        // Sign Board
+        ctx.fillStyle = '#27ae60'; // Green sign
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        
+        ctx.rect(x - width + 5, this.y - 60, width, height);
+        ctx.fill();
+        ctx.stroke();
+
+        // Text
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+        ctx.font = '8px "Press Start 2P"';
+        
+        const textCenter = x - (width / 2) + 5; 
+
+        const words = this.text.split(' ');
+        if(words.length > 2) {
+             ctx.fillText(words.slice(0,2).join(' '), textCenter, this.y - 25);
+             ctx.fillText(words.slice(2).join(' '), textCenter, this.y - 10);
+        } else {
+             ctx.fillText(this.text, textCenter, this.y - 20);
+        }
+
+        ctx.font = '6px "Press Start 2P"';
+        ctx.fillText("EXIT", textCenter, this.y - 45);
+    }
+}
+
+// Global Entities
+let player;
+let traffic = [];
+let scenery = [];
+
+// --- CORE FUNCTIONS ---
+
+function startGame(model) {
+    selectedCarModel = model;
+    initGame();
+}
+
+function resetToMenu() {
+    gameState = 'START';
+    document.getElementById('message-box').classList.remove('hidden');
+    document.getElementById('start-content').classList.remove('hidden');
+    document.getElementById('game-over-content').classList.add('hidden');
+    document.getElementById('title-text').innerText = "I-15 SIMULATOR";
+    document.getElementById('title-text').style.color = "#f1c40f";
+}
+
+function initGame() {
+    score = 0;
+    distance = 0;
+    speed = 0;
+    baseSpeed = 0;
+    mph = 0;
+    currentExitIndex = 0;
+    lastExitSpawnDistance = 0;
+    lastSpeedLimitSpawnDistance = 0;
+    traffic = [];
+    scenery = [];
+    
+    player = new Car(2, CANVAS_HEIGHT - 150, 'player');
+    
+    // Timer Init
+    startTime = Date.now();
+    
+    document.getElementById('timer-display').innerText = "TIME: 1:00";
+    document.getElementById('exit-display').innerText = "NEXT: " + EXITS[0];
+    document.getElementById('message-box').classList.add('hidden');
+    
+    gameState = 'PLAYING';
+    gameLoop();
+}
+
+function spawnTraffic() {
+    let isPointOfTheMountain = (currentExitIndex === 3);
+    
+    // Increased traffic by 20%
+    // Old Base: 0.015 -> New Base: 0.018
+    // Old Mountain: 0.036 -> New Mountain: ~0.043
+    let chance = 0.018;
+    if (isPointOfTheMountain) chance = 0.043;
+
+    if (Math.random() < chance) {
+        let type = 'traffic';
+        let rand = Math.random();
+        
+        // Removed construction.
+        if (rand < 0.20) {
+             type = 'police';
+        } else if (rand < 0.45) {
+             type = 'truck';
+        }
+
+        let lane;
+        // Trucks and Police not in Lane 0 (HOV)
+        if (type === 'police' || type === 'truck') {
+            lane = Math.floor(Math.random() * (LANE_COUNT - 1)) + 1;
+        } else {
+            lane = Math.floor(Math.random() * LANE_COUNT);
+        }
+
+        // Ensure no overlap
+        const safe = traffic.every(c => {
+            return c.lane !== lane || c.y > 100; 
+        });
+
+        if (safe) {
+            const car = new Car(lane, -250, type); 
+            traffic.push(car);
+        }
+    }
+}
+
+function checkCollisions() {
+    // 1. Car vs Traffic
+    const pRect = { l: player.x, r: player.x + player.width, t: player.y, b: player.y + player.height };
+
+    for (let car of traffic) {
+        const cRect = { l: car.x, r: car.x + car.width, t: car.y, b: car.y + car.height };
+
+        if (pRect.l < cRect.r && pRect.r > cRect.l && pRect.t < cRect.b && pRect.b > cRect.t) {
+            gameOver("CRASHED INTO TRAFFIC!");
+        }
+    }
+}
+
+function checkPoliceLogic() {
+    const policeCars = traffic.filter(c => c.type === 'police');
+
+    policeCars.forEach(cop => {
+        const playerCX = player.x + player.width/2;
+        const playerRear = player.y + player.height;
+        const copCX = cop.x + cop.width/2;
+        const inPassingZone = (player.y < cop.y + cop.height) && (playerRear > cop.y - 50);
+
+        if (inPassingZone) {
+            const isToRight = playerCX > copCX + (LANE_WIDTH/2);
+            if (isToRight) {
+                gameOver("PULLED OVER! (PASSED ON RIGHT)");
+            }
+            if (mph > 80) {
+                gameOver("PULLED OVER! (SPEEDING " + mph + " MPH)");
+            }
+        }
+    });
+}
+
+function update() {
+    if (gameState !== 'PLAYING') return;
+
+    // --- TIMER ---
+    let elapsed = (Date.now() - startTime) / 1000;
+    timeRemaining = Math.max(0, TIME_LIMIT - elapsed);
+    
+    let seconds = Math.floor(timeRemaining % 60);
+    let secStr = seconds < 10 ? "0" + seconds : seconds;
+    document.getElementById('timer-display').innerText = "TIME: 0:" + secStr;
+    
+    if (timeRemaining <= 0) {
+        gameOver("LATE FOR WORK! TIME EXPIRED.");
+        return;
+    }
+
+    // --- PLAYER MOVEMENT ---
+    if (keys.ArrowLeft && player.x > ROAD_X) {
+        player.x -= 5;
+    }
+    if (keys.ArrowRight && player.x < ROAD_X + (LANE_COUNT * LANE_WIDTH) - player.width) {
+        player.x += 5;
+    }
+    
+    player.lane = Math.floor((player.x - ROAD_X + player.width/2) / LANE_WIDTH);
+
+    if (keys.ArrowUp) {
+        baseSpeed += 0.05; 
+    } else if (keys.ArrowDown) {
+        baseSpeed -= 0.2;
+    } else {
+        baseSpeed *= 0.99; 
+    }
+
+    if (baseSpeed < 0) baseSpeed = 0;
+    if (baseSpeed > 15) baseSpeed = 15; 
+
+    let speedMultiplier = 1.0;
+    if (player.lane === 0) {
+        speedMultiplier = 1.25; // 1.25x HOV Boost (Changed from 1.5)
+    }
+
+    speed = baseSpeed * speedMultiplier;
+    mph = Math.floor(speed * MPH_SCALE); 
+    document.getElementById('speed-display').innerText = "SPEED: " + mph + " MPH";
+    
+    if (mph > 80) document.getElementById('speed-display').style.color = '#e74c3c'; 
+    else document.getElementById('speed-display').style.color = '#fff';
+
+    distance += speed;
+
+    // --- SCENERY ---
+    let currentInterval = EXIT_INTERVAL;
+    if (currentExitIndex === 3) currentInterval = EXIT_INTERVAL * 2;
+
+    if (distance > lastSpeedLimitSpawnDistance + (currentInterval/2) && 
+        distance < lastExitSpawnDistance + currentInterval) {
+        if (distance - lastExitSpawnDistance > currentInterval/2 && distance - lastExitSpawnDistance < (currentInterval/2) + 100) {
+             if (scenery.length === 0 || scenery[scenery.length-1].type !== 'speedlimit') {
+                scenery.push(new SceneryObject(-100, 'speedlimit'));
+                lastSpeedLimitSpawnDistance = distance;
+             }
+        }
+    }
+
+    if (distance > lastExitSpawnDistance + currentInterval && currentExitIndex < EXITS.length) {
+        // Swap Order: Exit Sign (-100, visible sooner) then Ramp (-600, visible later)
+        // Note: Objects move UP the screen relative to canvas 0 if speed is positive? 
+        // No, player stays put, objects spawn at negative Y and add speed to Y.
+        // So they move DOWN the screen.
+        // Higher Y = Lower on screen.
+        // Sign should be seen BEFORE Ramp.
+        // Sign should be Lower (higher Y) than Ramp (lower Y/more negative).
+        // If Sign is -100 and Ramp is -600:
+        // Frame 0: Sign at -100, Ramp at -600.
+        // Frame 100 (speed 1): Sign at 0 (visible), Ramp at -500 (not visible).
+        // Frame 600: Sign at 500 (bottom), Ramp at 0 (visible).
+        // So Sign appears first. This is correct for "Ramp appears AFTER signs".
+        scenery.push(new SceneryObject(-100, 'exit', EXITS[currentExitIndex]));
+        scenery.push(new SceneryObject(-600, 'ramp'));
+        
+        lastExitSpawnDistance = distance;
+        lastSpeedLimitSpawnDistance = distance;
+        
+        if (currentExitIndex + 1 < EXITS.length) {
+            document.getElementById('exit-display').innerText = "NEXT: " + EXITS[currentExitIndex + 1];
+        } else {
+            document.getElementById('exit-display').innerText = "NEXT: SALT LAKE CITY";
+        }
+    }
+
+    for (let i = scenery.length - 1; i >= 0; i--) {
+        scenery[i].y += speed;
+        
+        if (scenery[i].type === 'exit') {
+            if (!scenery[i].scored && scenery[i].y > player.y) {
+                currentExitIndex++;
+                scenery[i].scored = true;
+
+                if (currentExitIndex === EXITS.length) {
+                    gameOver("VICTORY! MADE IT TO WORK.", true);
+                }
+            }
+        }
+
+        if (scenery[i].y > CANVAS_HEIGHT) {
+            scenery.splice(i, 1);
+        }
+    }
+
+    // --- TRAFFIC ---
+    spawnTraffic();
+
+    // AI Logic
+    traffic.sort((a, b) => a.y - b.y);
+
+    for (let i = 0; i < traffic.length; i++) {
+        let me = traffic[i];
+        
+        me.speed = me.maxSpeed;
+
+        for (let j = i - 1; j >= 0; j--) {
+            let other = traffic[j];
+            if (me.lane === other.lane) {
+                let gap = me.y - (other.y + other.height);
+                
+                if (gap < 250) {
+                    if (gap < 50) me.speed = Math.min(me.speed, other.speed - 0.5); 
+                    else me.speed = Math.min(me.speed, other.speed);
+                }
+                break;
+            }
+        }
+    }
+
+    for (let i = traffic.length - 1; i >= 0; i--) {
+        let t = traffic[i];
+        
+        t.y += (speed - t.speed);
+
+        if (t.y > CANVAS_HEIGHT + 100 || t.y < -400) {
+            traffic.splice(i, 1);
+        }
+    }
+
+    checkCollisions();
+    checkPoliceLogic();
+}
+
+function draw() {
+    ctx.fillStyle = COLORS.grass;
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+    ctx.fillStyle = COLORS.road;
+    ctx.fillRect(ROAD_X, 0, LANE_COUNT * LANE_WIDTH, CANVAS_HEIGHT);
+
+    ctx.lineWidth = 4;
+    
+    for (let i = 1; i < LANE_COUNT; i++) {
+        let x = ROAD_X + (i * LANE_WIDTH);
+        
+        ctx.beginPath();
+        if (i === 1) {
+            ctx.strokeStyle = COLORS.line;
+            ctx.setLineDash([]); 
+            ctx.moveTo(x - 3, 0);
+            ctx.lineTo(x - 3, CANVAS_HEIGHT);
+            ctx.stroke();
+            
+            ctx.moveTo(x + 3, 0);
+            ctx.lineTo(x + 3, CANVAS_HEIGHT);
+            ctx.stroke();
+
+            // HOV Diamond Marker - SOLID & STATIC LOOP
+            const diamondSpacing = 600;
+            ctx.fillStyle = 'white';
+            
+            // Draw markers based on modulo arithmetic for infinite scrolling
+            for (let j = -1; j <= 2; j++) {
+                let markerY = (distance % diamondSpacing) + (j * diamondSpacing);
+                
+                if (markerY > -50 && markerY < CANVAS_HEIGHT + 50) {
+                    ctx.beginPath();
+                    const dx = ROAD_X + (LANE_WIDTH/2);
+                    ctx.moveTo(dx, markerY);
+                    ctx.lineTo(dx + 10, markerY + 20);
+                    ctx.lineTo(dx, markerY + 40);
+                    ctx.lineTo(dx - 10, markerY + 20);
+                    ctx.fill();
+                }
+            }
+
+        } else {
+            ctx.strokeStyle = COLORS.line;
+            ctx.setLineDash([30, 30]);
+            ctx.lineDashOffset = -distance; 
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, CANVAS_HEIGHT);
+            ctx.stroke();
+        }
+    }
+    ctx.setLineDash([]); 
+
+    traffic.sort((a,b) => a.y - b.y);
+    traffic.forEach(t => t.draw());
+
+    if (gameState !== 'GAMEOVER_CRASH') {
+        player.draw();
+    }
+
+    scenery.forEach(e => {
+        e.draw();
+    });
+    
+    if (currentExitIndex === 3) {
+        if (Math.floor(Date.now() / 500) % 2 === 0) {
+            ctx.fillStyle = 'rgba(230, 126, 34, 0.8)';
+            ctx.fillRect(0, 50, CANVAS_WIDTH, 40);
+            
+            ctx.fillStyle = '#FFF';
+            ctx.textAlign = 'center';
+            ctx.font = '14px "Press Start 2P"';
+            ctx.fillText("THE POINT OF THE MOUNTAIN", CANVAS_WIDTH/2, 75);
+        }
+    }
+}
+
+function gameLoop() {
+    if (gameState === 'PLAYING') {
+        frameCount++;
+        update();
+        draw();
+        requestAnimationFrame(gameLoop);
+    }
+}
+
+function gameOver(reason, victory = false) {
+    gameState = victory ? 'VICTORY' : 'GAMEOVER';
+    
+    const box = document.getElementById('message-box');
+    const title = document.getElementById('title-text');
+    const startContent = document.getElementById('start-content');
+    const gameOverContent = document.getElementById('game-over-content');
+    const gameOverText = document.getElementById('game-over-text');
+
+    box.classList.remove('hidden');
+    startContent.classList.add('hidden');
+    gameOverContent.classList.remove('hidden');
+
+    title.innerText = victory ? "SALT LAKE CITY!" : "GAME OVER";
+    title.style.color = victory ? "#2ecc71" : "#e74c3c";
+    gameOverText.innerHTML = reason;
+}
+
+// --- INPUTS ---
+window.addEventListener('keydown', (e) => { if (keys.hasOwnProperty(e.code)) keys[e.code] = true; });
+window.addEventListener('keyup', (e) => { if (keys.hasOwnProperty(e.code)) keys[e.code] = false; });
+
+const setupTouchBtn = (id, key) => {
+    const el = document.getElementById(id);
+    el.addEventListener('touchstart', (e) => { e.preventDefault(); keys[key] = true; });
+    el.addEventListener('touchend', (e) => { e.preventDefault(); keys[key] = false; });
+    el.addEventListener('mousedown', (e) => { e.preventDefault(); keys[key] = true; });
+    el.addEventListener('mouseup', (e) => { e.preventDefault(); keys[key] = false; });
+};
+setupTouchBtn('btn-up', 'ArrowUp');
+setupTouchBtn('btn-down', 'ArrowDown');
+setupTouchBtn('btn-left', 'ArrowLeft');
+setupTouchBtn('btn-right', 'ArrowRight');
+
+</script>
+
+ <!-- Footer
+    <footer class="border-top">
+        <div class="container px-4 px-lg-5">
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-md-10 col-lg-8 col-xl-7">
+                    <ul class="list-inline text-center">
+                        <li class="list-inline-item">
+                            <a href="https://www.linkedin.com/in/justin-guptill/" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fas fa-circle fa-stack-2x"></i>
+                                    <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="small text-center text-muted fst-italic">Site created by Justin Guptill, 2025</div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="js/scripts.js"></script> -->
+
+</body>
+</html>
